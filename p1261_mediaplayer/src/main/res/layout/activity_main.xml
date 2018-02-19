@@ -43,6 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onClickStart"
             android:text="@string/uri"
             android:textSize="12sp"/>
         <Button
@@ -63,22 +64,28 @@
         android:layout_below="@+id/linearlayout1"
         android:layout_marginTop="30dp">
         <Button
+            android:id="@+id/btnPause"
             android:text="@string/pause"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onClick"
             android:textSize="12sp"/>
         <Button
+            android:id="@+id/btnResume"
             android:text="@string/resume"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onClick"
             android:textSize="12sp"/>
         <Button
+            android:id="@+id/btnStop"
             android:text="@string/stop"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="onClick"
             android:textSize="12sp"/>
         <CheckBox
             android:layout_width="wrap_content"

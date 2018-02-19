@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -24,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnPre
             + "/music.mp3";
     final Uri DATA_URI = ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, 13359);
 
-
     MediaPlayer mediaPlayer;
     AudioManager audioManager;
     CheckBox chbLoop;
@@ -33,18 +33,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnPre
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        chbLoop = (CheckBox) findViewById(R.id.chbLoop);
-//        chbLoop.setOnClickListener(new CompoundButton.OnCheckedChangeListener(){
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView,
-//                                         boolean isChecked){
-//                if (mediaPlayer != null) {
-//                    mediaPlayer.setLooping(isChecked);
-//                }
-//            }
-//        });
+        chbLoop = (CheckBox)findViewById(R.id.chbLoop);
     }
 
     public void onClickStart(View v){
@@ -70,12 +60,29 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnPre
                     mediaPlayer.prepareAsync();
                     break;
                 case R.id.btnStartSD:
-                    Log.d(LOG_TAG,"start SD: "
-                            + DATA_SD);
+                    Log.d(LOG_TAG,"start SD: " + DATA_SD);
                     mediaPlayer = new MediaPlayer();
                     mediaPlayer.setDataSource(DATA_SD);
+                    Toast.makeText(this,"set data source ok", Toast.LENGTH_LONG).show();
+                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    mediaPlayer.prepare();
+                    Toast.makeText(this,"prepare ok", Toast.LENGTH_LONG).show();
+                    mediaPlayer.start();
+                    Toast.makeText(this,"start ok", Toast.LENGTH_LONG).show();
+                    break;
+                case R.id.btnStartUri:
+                    Log.d(LOG_TAG,"start uri");
+                    mediaPlayer = new MediaPlayer();
+                    mediaPlayer.setDataSource(this, DATA_URI);
+                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.prepare();
                     mediaPlayer.start();
+                    break;
+                case R.id.btnStartRaw:
+                    Log.d(LOG_TAG,"start Raw");
+                    mediaPlayer = MediaPlayer.create(this, R.raw.explosion);
+                    mediaPlayer.start();
+                    break;
             }
         }catch (IOException e){
             e.printStackTrace();
@@ -90,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnPre
                 Log.d(LOG_TAG,"onCompletion");
             }
         });
-//        mediaPlayer.setOnCompletionListener(this);
     }
 
     private void releaseMP(){
@@ -104,16 +110,49 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnPre
         }
     }
 
+    public void onClick(View v){
+        if (mediaPlayer == null) {
+            return;
+        }
+        switch (v.getId()){
+            case R.id.btnPause:
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.pause();
+                }
+                break;
+            case R.id.btnResume:
+                if(!mediaPlayer.isPlaying()){
+                    mediaPlayer.release();
+                }
+                break;
+            case R.id.btnStop:
+                mediaPlayer.stop();
+                break;
+            case R.id.btnBackward:
+                mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 3000);
+                break;
+            case R.id.btnForward:
+                mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 3000);
+                break;
+            case R.id.btnInfo:
+                Log.d(LOG_TAG,"Playing " + mediaPlayer.isPlaying());
+                Log.d(LOG_TAG,"Time + " + mediaPlayer.getCurrentPosition() + " / " +
+                    + mediaPlayer.getDuration());
+                Log.d(LOG_TAG,"Looping " + mediaPlayer.isLooping());
+                Log.d(LOG_TAG,"Volume " + audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+                break;
+        }
+    }
+
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         Log.d(LOG_TAG,"onPrepared");
         mediaPlayer.start();
     }
 
-//    @Override
-//    public void onCompletion(MediaPlayer mediaPlayer) {
-//        Log.d(LOG_TAG,"onCompletion");
-//    }
+    public void onCompletion(MediaPlayer mp){
+        Log.d(LOG_TAG,"onCompletion");
+    }
 
     @Override
     public void onDestroy() {
